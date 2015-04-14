@@ -76,13 +76,13 @@ float bounceEaseOut(float t)
     [self.view addSubview:self.ballView];
     
     UIButton *button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    button.frame = CGRectMake(50, 50, 120, 50);
+    button.frame = CGRectMake(30, 50, 120, 50);
     [self.view addSubview:button];
     [button setTitle:@"开始动画" forState:UIControlStateNormal];
     [button addTarget:self action:@selector(doAnimation) forControlEvents:UIControlEventTouchUpInside];
 
     UIButton *button1 = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    button1.frame = CGRectMake(200, 50, 120, 50);
+    button1.frame = CGRectMake(170, 50, 120, 50);
     [self.view addSubview:button1];
     [button1 setTitle:@"开始动画(Dis)" forState:UIControlStateNormal];
     [button1 addTarget:self action:@selector(caDoAnimation) forControlEvents:UIControlEventTouchUpInside];
