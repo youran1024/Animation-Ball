@@ -15,14 +15,17 @@
  *  http://robertpenner.com/easing/
  */
 
+
+static int shouldDisplayLink;
 @interface ViewController ()
 @property (nonatomic) UIImageView *ballView;
 @property (nonatomic) NSTimeInterval timeOffset;
 @property (nonatomic) NSTimeInterval duration;
 @property (nonatomic) NSTimer *timer;
+@property (nonatomic) CADisplayLink *displayLink;
 @property (nonatomic, strong)   id fromValue;
 @property (nonatomic, strong)   id toValue;
-
+@property (nonatomic, assign)   CFTimeInterval lastAnimateTime;
 
 @end
 
@@ -65,6 +68,8 @@ float bounceEaseOut(float t)
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    shouldDisplayLink = 1;
+    
     self.ballView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ball"]];
     self.ballView.frame = CGRectMake(0, 0, 50, 50);
     self.ballView.center = CGPointMake(150, 150);
@@ -75,11 +80,25 @@ float bounceEaseOut(float t)
     [self.view addSubview:button];
     [button setTitle:@"开始动画" forState:UIControlStateNormal];
     [button addTarget:self action:@selector(doAnimation) forControlEvents:UIControlEventTouchUpInside];
+
+    UIButton *button1 = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    button1.frame = CGRectMake(200, 50, 120, 50);
+    [self.view addSubview:button1];
+    [button1 setTitle:@"开始动画(Dis)" forState:UIControlStateNormal];
+    [button1 addTarget:self action:@selector(caDoAnimation) forControlEvents:UIControlEventTouchUpInside];
+}
+
+- (void)caDoAnimation
+{
+    shouldDisplayLink = 1;
     
+    [self ballAnimation];
 }
 
 - (void)doAnimation
 {
+    shouldDisplayLink = 0;
+    
     [self ballAnimation];
 }
 
@@ -92,15 +111,31 @@ float bounceEaseOut(float t)
     self.fromValue = [NSValue valueWithCGPoint:CGPointMake(150, 150)];
     self.toValue = [NSValue valueWithCGPoint:CGPointMake(150, 280)];
     
-    [self.timer invalidate];
-    self.timer = [NSTimer scheduledTimerWithTimeInterval:1/60.0f target:self selector:@selector(animated:) userInfo:nil repeats:YES];
+    if (shouldDisplayLink) {
+        self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(animated:)];
+        [self.displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+        
+    }else {
+        [self.timer invalidate];
+        self.timer = [NSTimer scheduledTimerWithTimeInterval:1/60.0f target:self selector:@selector(animated:) userInfo:nil repeats:YES];
+    }
     
 }
 
 - (void)animated:(NSTimer *)timer
 {
-    self.timeOffset = MIN(self.timeOffset + 1 / 60.0f, self.duration);
+
+    if (shouldDisplayLink) {
+        CFTimeInterval thisStep = CACurrentMediaTime();
+        CFTimeInterval duration = thisStep - self.lastAnimateTime;
+        self.lastAnimateTime = thisStep;
+        self.timeOffset = MIN(self.timeOffset + duration, self.duration);
+    }else {
+        self.timeOffset = MIN(self.timeOffset + 1 / 60.0f, self.duration);
+    }
+    
     float time = self.timeOffset / self.duration;
+    
     
     time = bounceEaseOut(time);
     
