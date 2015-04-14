@@ -62,27 +62,35 @@ float bounceEaseOut(float t)
     return (time < 0.5)? fromValue: toValue;
 }
 
-
 - (void)viewDidLoad {
     [super viewDidLoad];
     
     self.ballView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ball"]];
     self.ballView.frame = CGRectMake(0, 0, 50, 50);
-    
+    self.ballView.center = CGPointMake(150, 150);
     [self.view addSubview:self.ballView];
     
+    UIButton *button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    button.frame = CGRectMake(50, 50, 120, 50);
+    [self.view addSubview:button];
+    [button setTitle:@"开始动画" forState:UIControlStateNormal];
+    [button addTarget:self action:@selector(doAnimation) forControlEvents:UIControlEventTouchUpInside];
+    
+}
+
+- (void)doAnimation
+{
     [self ballAnimation];
 }
 
 - (void)ballAnimation
 {
-    self.ballView.center = CGPointMake(150, 32);
-    
+    self.ballView.center = CGPointMake(150, 150);
     self.duration = 3.0f;
     self.timeOffset = .0f;
     
-    self.fromValue = [NSValue valueWithCGPoint:CGPointMake(150, 32)];
-    self.toValue = [NSValue valueWithCGPoint:CGPointMake(150, 268)];
+    self.fromValue = [NSValue valueWithCGPoint:CGPointMake(150, 150)];
+    self.toValue = [NSValue valueWithCGPoint:CGPointMake(150, 280)];
     
     [self.timer invalidate];
     self.timer = [NSTimer scheduledTimerWithTimeInterval:1/60.0f target:self selector:@selector(animated:) userInfo:nil repeats:YES];
@@ -100,9 +108,10 @@ float bounceEaseOut(float t)
     
     self.ballView.center = [position CGPointValue];
     
-    if (self.timeOffset > self.duration) {
+    if (self.timeOffset >= self.duration) {
         [self.timer invalidate];
         self.timer = nil;
+        self.ballView.center = CGPointMake(150, 150);
     }
     
 }
