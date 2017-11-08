@@ -1,7 +1,7 @@
 # Animation-Ball
 ![图片](https://github.com/youran1024/Animation-Ball/blob/master/ballAnimation.gif)
 
-###通过NSTimer 和 CADisplayLink实现的自定义帧动画
+### 通过NSTimer 和 CADisplayLink实现的自定义帧动画
 
 `鸣谢`
 	
